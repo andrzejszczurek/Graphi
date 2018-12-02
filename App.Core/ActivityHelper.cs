@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace App.Core
 {
-   public static class ActivityHelper
+   internal static class ActivityHelper
    {
 
       public static IList<Activity> MarkCriticalPath(this IList<Activity> a_activities)

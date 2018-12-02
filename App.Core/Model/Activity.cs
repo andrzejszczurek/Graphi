@@ -15,6 +15,8 @@ namespace App.Core.Model
 
       public bool IsCritical { get; set; }
 
+      public int TechnicalId { get; set; }
+
       public Activity()
       {
          Predecessors = new List<Activity>();

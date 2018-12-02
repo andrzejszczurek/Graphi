@@ -8,7 +8,7 @@ namespace App.Core.Model
 {
    public abstract class BaseActivity<T>
    {
-      public string Id { get; set; }
+      public int Id { get; set; }
 
       public T Duration { get; set; }
 

@@ -1,58 +1,50 @@
-﻿using App.Core.Model;
+﻿using App.Core.DataParser;
+using App.Core.Model;
 using Microsoft.Msagl.Drawing;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace App.Core.Brigde
 {
-   public class ActivityToNodeConverter
+   internal static class ActivityToNodeConverter
    {
-      private readonly IEnumerable<Activity> m_activities;
 
-      private readonly List<Node> m_testNodes;
-
-      public ActivityToNodeConverter(IEnumerable<Activity> a_activities)
+      public static Graph PrepareGraph(IEnumerable<Activity> a_activities, string a_name)
       {
-         m_activities = a_activities;
-         m_testNodes = GenerateTestNodes();
-      }
+         Graph graph = new Graph(a_name);
 
-      private List<Node> GenerateTestNodes()
-      {
          var nodes = new List<Node>();
-         var events = new List<(int, int)>()
+         foreach (var activity in a_activities.OrderBy(x => x.Id))
          {
-            (1, 2),
-            (1, 3),
-            (1, 4),
-            (2, 3),
-            (2, 5),
-            (3, 6),
-            (3, 7),
-            (4, 7),
-            (5, 8),
-            (6, 8),
-            (7, 8),
-         };
+            Node node;
+            if (activity.IsStart == true)
+               node = Create(activity.TechnicalId, true);
+            else
+               node = Create(activity.TechnicalId);
 
-         foreach (var e in events)
-         {
-
+            nodes.Add(node);
+            graph.AddNode(node);
          }
 
-         return nodes;
+         foreach (var node in nodes.OrderBy(x => x.Id))
+         {
+            var activityForNode = a_activities.Single(x => x.TechnicalId == int.Parse(node.Id));
+            foreach (var act in activityForNode.Successors)
+            {
+               var nodeForActivity = nodes.Single(x => x.Id == act.TechnicalId.ToString());
+               graph.AddEdge(activityForNode.TechnicalId.ToString(), nodeForActivity.Id);
+            }
+         }
+         return graph;
       }
 
-
-      public IEnumerable<Node> GetNodes()
+      private static Node Create(int Id, bool IsStart = false)
       {
-         var nodes = new List<Node>();
-         return nodes;
+         Node n = new Node(Id.ToString());
+         n.Attr.Color = IsStart ? Color.Green : Color.Black;
+         n.Attr.Shape = Shape.Circle;
+         n.LabelText = DataGenerator.IdAsLiteral(Id);
+         return n;
       }
-
    }
 }
